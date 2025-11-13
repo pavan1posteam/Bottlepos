@@ -30,7 +30,7 @@ namespace BottlePos
                 {
                     try
                     {
-                        if(current.StoreSettings.StoreId == 12687)
+                        if(current.StoreSettings.StoreId == 12733)
                         {
                             Console.WriteLine("Generating for: " + current.StoreSettings.StoreId);
                             var data = GetData(current.StoreSettings.StoreId, current.StoreSettings.POSSettings.Username, current.StoreSettings.POSSettings.Password, current.StoreSettings.POSSettings.AuthUrl, current.StoreSettings.POSSettings.ItemUrl, current.StoreSettings.POSSettings.FtpUserName, current.StoreSettings.POSSettings.FtpPassword);
