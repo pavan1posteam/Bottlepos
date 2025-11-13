@@ -30,7 +30,7 @@ namespace BottlePos
                 {
                     try
                     {
-                        if(current.StoreSettings.StoreId == 12687)
+                        if(current.StoreSettings.StoreId == 12503)
                         {
                             Console.WriteLine("Generating for: " + current.StoreSettings.StoreId);
                             var data = GetData(current.StoreSettings.StoreId, current.StoreSettings.POSSettings.Username, current.StoreSettings.POSSettings.Password, current.StoreSettings.POSSettings.AuthUrl, current.StoreSettings.POSSettings.ItemUrl, current.StoreSettings.POSSettings.FtpUserName, current.StoreSettings.POSSettings.FtpPassword);
@@ -448,6 +448,142 @@ namespace BottlePos
                             pf.Add(pdf1);
                             pd.Add(fdf1);
                         }
+
+
+                        #region
+                            // === HANDLE MODIFIERS SEPARATELY  ===  for storeID 12503
+                            //if (item.modifiers != null && item.modifiers.Count > 0)
+                            //{
+                            //    foreach (var modifier in item.modifiers)
+                            //    {
+                            //        datatableModel modPdf = new datatableModel();
+                            //        FullNameProductModel modFdf = new FullNameProductModel();
+
+                            //        // Keep SAME outer UPC (do not override top-level)
+                            //        modPdf.StoreID = storeid;
+                            //        modPdf.upc = pdf.upc;
+                            //        modFdf.upc = fdf.upc;
+                            //        modPdf.sku = pdf.sku;
+                            //        modFdf.sku = fdf.sku;
+
+                            //        // Price & Qty from modifier
+                            //        modPdf.Price = Convert.ToDecimal(modifier.price);
+                            //        modFdf.Price = Convert.ToDecimal(modifier.price);
+
+                            //        if (Convert.ToDecimal(modifier.qty) != 0)
+                            //        {
+                            //            decimal totalStock = Convert.ToDecimal(item.total_stock);
+                            //            decimal qtyFromModifier = Convert.ToDecimal(modifier.qty);
+
+                            //            // Keep fractional quantity if needed, but cast down for CSV
+                            //            modPdf.Qty = (int)Math.Floor(totalStock / qtyFromModifier);
+                            //        }
+                            //        else
+                            //        {
+                            //            modPdf.Qty = pdf.Qty;  // fallback
+                            //        }
+
+                            //        // Copy details from main product
+                            //        modPdf.pack = modifier.qty;
+                            //        modFdf.pack = Convert.ToInt32(modifier.qty);
+                            //        modPdf.uom = pdf.uom;
+                            //        modFdf.uom = fdf.uom;
+                            //        modPdf.Tax = pdf.Tax;
+                            //        modPdf.StoreProductName = pdf.StoreProductName;
+                            //        modFdf.pname = fdf.pname;
+                            //        modPdf.StoreDescription = pdf.StoreDescription;
+                            //        modFdf.pdesc = fdf.pdesc;
+                            //        modFdf.pcat = fdf.pcat;
+                            //        modFdf.pcat1 = fdf.pcat1;
+                            //        modFdf.pcat2 = fdf.pcat2;
+                            //        modFdf.country = fdf.country;
+                            //        modFdf.region = fdf.region;
+
+                            //        // Add to list without touching top-level
+                            //        pf.Add(modPdf);
+                            //        pd.Add(modFdf);
+                            //    }
+                            //}
+                            #endregion
+
+
+                            // ===  MODIFIERS WITH UPC ASSIGNMENT RULES ===  for storeId 12503
+                              else  if (item.modifiers != null && item.modifiers.Count > 0)
+                                 {
+                                     for (int i = 0; i < item.modifiers.Count; i++)
+                                     {
+                                         var modifier = item.modifiers[i];
+                                         datatableModel modPdf = new datatableModel();
+                                         FullNameProductModel modFdf = new FullNameProductModel();
+
+                                         // --- UPC assignment rules ---
+                                         string modUpc;
+                                         if (number.Length == 1)
+                                         {
+                                             // Case 2: Only one code, share with top-level
+                                             modUpc = "#" + number[0];
+                                         }
+                                         else if (number.Length == 2 && item.modifiers.Count == 2)
+                                         {
+                                             // Case 3: Two codes + two modifiers → 1st code = top, 2nd code = both modifiers
+                                             modUpc = "#" + number[1];
+                                         }
+                                         else
+                                         {
+                                             // General case: map remaining codes to modifiers
+                                             if (i + 1 < number.Length)
+                                             {
+                                                 modUpc = "#" + number[i + 1]; // next code for this modifier
+                                             }
+                                             else
+                                             {
+                                                 // Fallback: reuse last available code
+                                                 modUpc = "#" + number[number.Length - 1];
+                                             }
+                                         }
+
+                                         modPdf.StoreID = storeid;
+                                         modPdf.upc = modUpc;
+                                         modFdf.upc = modUpc;
+                                         modPdf.sku = modUpc;
+                                         modFdf.sku = modUpc;
+
+                                         // Price & Qty from modifier
+                                         modPdf.Price = Convert.ToDecimal(modifier.price);
+                                         modFdf.Price = Convert.ToDecimal(modifier.price);
+
+                                         if (Convert.ToDecimal(modifier.qty) != 0)
+                                         {
+                                             decimal totalStock = Convert.ToDecimal(item.total_stock);
+                                             decimal qtyFromModifier = Convert.ToDecimal(modifier.qty);
+                                             modPdf.Qty = (int)Math.Floor(totalStock / qtyFromModifier);
+                                         }
+                                         else
+                                         {
+                                             modPdf.Qty = pdf.Qty;  // fallback
+                                         }
+
+                                         // Copy other properties
+                                         modPdf.pack = modifier.qty;
+                                         modFdf.pack = Convert.ToInt32(modifier.qty);
+                                         modPdf.uom = pdf.uom;
+                                         modFdf.uom = fdf.uom;
+                                         modPdf.Tax = pdf.Tax;
+                                         modPdf.StoreProductName = pdf.StoreProductName;
+                                         modFdf.pname = fdf.pname;
+                                         modPdf.StoreDescription = pdf.StoreDescription;
+                                         modFdf.pdesc = fdf.pdesc;
+                                         modFdf.pcat = fdf.pcat;
+                                         modFdf.pcat1 = fdf.pcat1;
+                                         modFdf.pcat2 = fdf.pcat2;
+                                         modFdf.country = fdf.country;
+                                         modFdf.region = fdf.region;
+
+                                         // Add to list
+                                         pf.Add(modPdf);
+                                         pd.Add(modFdf);
+                                     }
+                                 }
                     }
                     catch (Exception ex)
                     {
