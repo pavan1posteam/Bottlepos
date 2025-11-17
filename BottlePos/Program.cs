@@ -30,9 +30,10 @@ namespace BottlePos
                 {
                     try
                     {
-                        if(current.StoreSettings.StoreId == 12789)
-                        {
-                            Console.WriteLine("Generating for: " + current.StoreSettings.StoreId);
+                        /*if (current.StoreSettings.StoreId == 12789)
+                        { }
+                        else { continue; }*/
+                        Console.WriteLine("Generating for: " + current.StoreSettings.StoreId);
                             var data = GetData(current.StoreSettings.StoreId, current.StoreSettings.POSSettings.Username, current.StoreSettings.POSSettings.Password, current.StoreSettings.POSSettings.AuthUrl, current.StoreSettings.POSSettings.ItemUrl, current.StoreSettings.POSSettings.FtpUserName, current.StoreSettings.POSSettings.FtpPassword);
                             var jObj = (JObject.Parse(data)["data"]);
                             Dictionary<object, object> dictObj = jObj.ToObject<Dictionary<object, object>>();
@@ -46,7 +47,7 @@ namespace BottlePos
                             Console.WriteLine("Generating CSV file : " + current.StoreSettings.StoreId);
                             BottleposcsvConverter(itemList, current.StoreSettings.StoreId, current.StoreSettings.POSSettings.tax, current.StoreSettings.POSSettings.FtpUserName, current.StoreSettings.POSSettings.FtpPassword);
                             Console.WriteLine();
-                        }
+                        
                     }
                     catch (Exception ex)
                     {
