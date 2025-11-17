@@ -71,6 +71,12 @@ namespace BottlePos
         {
             try
             {
+                bool flag = Regex.IsMatch(AuthUrl, @"com$");
+                if (flag)
+                {
+                    AuthUrl += "/api/auth";
+                    flag = false;
+                }
                 System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
                 var BaseUrl = AuthUrl;
                 Password = ComputeSha256Hash(Password);
@@ -90,6 +96,9 @@ namespace BottlePos
                     response.EnsureSuccessStatusCode();
                 }).Wait();
                 var BaseUrl1 = ItemUrl;
+                flag = Regex.IsMatch(BaseUrl1, @"com$");
+                if (flag)
+                    BaseUrl1 += "/api/items/get";
                 response = new HttpResponseMessage();
                 Task.Run(async () =>
                 {
