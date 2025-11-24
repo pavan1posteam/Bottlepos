@@ -27,7 +27,7 @@ namespace BottlePos
                     using (SqlCommand cmd = new SqlCommand())
                     {
                         cmd.Connection = con;
-                        //cmd.Parameters.Add(sparams[0]);
+                        cmd.Parameters.Add(sparams[0]);
                         cmd.CommandText = "usp_ts_GetStorePosSetting";
                         cmd.CommandType = CommandType.StoredProcedure;
                         using (SqlDataAdapter da = new SqlDataAdapter())
